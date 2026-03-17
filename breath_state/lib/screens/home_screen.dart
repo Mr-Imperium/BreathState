@@ -1,10 +1,14 @@
 import 'package:breath_state/constants/db_constants.dart';
+import 'package:breath_state/providers/go_direct_provider.dart';
+import 'package:breath_state/providers/polar_connect_provider.dart';
 import 'package:breath_state/services/db_service/database_service.dart';
+import 'package:breath_state/services/go_direct/go_direct_constants.dart';
 import 'package:breath_state/theme/app_theme.dart';
 import 'package:breath_state/widgets/glass_card.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -278,6 +282,104 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                             const SizedBox(height: 16),
+
+                            Consumer2<PolarConnectProvider, GoDirectProvider>(
+                              builder: (context, polarProvider, gdProvider, _) {
+                                final polarConnected = polarProvider.getPolarConnect() != null;
+                                final gdState = gdProvider.connectionState;
+
+                                String gdLabel;
+                                Color gdColor;
+                                switch (gdState) {
+                                  case GoDirectConnectionState.scanning:
+                                    gdLabel = 'Scanning…';
+                                    gdColor = Colors.amber;
+                                    break;
+                                  case GoDirectConnectionState.connecting:
+                                  case GoDirectConnectionState.initializing:
+                                    gdLabel = 'Connecting…';
+                                    gdColor = Colors.amber;
+                                    break;
+                                  case GoDirectConnectionState.streaming:
+                                    gdLabel = 'Streaming';
+                                    gdColor = AppTheme.softTeal;
+                                    break;
+                                  case GoDirectConnectionState.connected:
+                                    gdLabel = 'Connected';
+                                    gdColor = Colors.green;
+                                    break;
+                                  default:
+                                    gdLabel = 'Not Connected';
+                                    gdColor = Colors.grey;
+                                }
+
+                                return GlassCard(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 12),
+                                  margin: const EdgeInsets.only(bottom: 16),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Row(
+                                          children: [
+                                            Icon(Icons.favorite_rounded,
+                                                size: 16,
+                                                color: polarConnected
+                                                    ? AppTheme.roseAccent
+                                                    : Colors.grey),
+                                            const SizedBox(width: 6),
+                                            Flexible(
+                                              child: Text(
+                                                polarConnected
+                                                    ? 'Polar H10'
+                                                    : 'Polar: Off',
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .labelMedium
+                                                    ?.copyWith(
+                                                      color: polarConnected
+                                                          ? Colors.green
+                                                          : Colors.grey,
+                                                    ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 1,
+                                        height: 20,
+                                        color: Theme.of(context)
+                                            .dividerColor
+                                            .withOpacity(0.2),
+                                      ),
+                                      Expanded(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Icon(Icons.air_rounded,
+                                                size: 16, color: gdColor),
+                                            const SizedBox(width: 6),
+                                            Flexible(
+                                              child: Text(
+                                                gdLabel,
+                                                style: Theme.of(context)
+                                                    .textTheme
+                                                    .labelMedium
+                                                    ?.copyWith(color: gdColor),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
                           ],
                         ),
                       ),
@@ -298,7 +400,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             AppTheme.roseAccent,
                             "bpm",
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 120),
                         ]),
                       ),
                     ),

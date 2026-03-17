@@ -1,3 +1,4 @@
+import 'package:breath_state/providers/go_direct_provider.dart';
 import 'package:breath_state/providers/nav_bar_provider.dart';
 import 'package:breath_state/providers/polar_connect_provider.dart';
 import 'package:breath_state/providers/theme_provider.dart';
@@ -24,6 +25,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => NavBarProvider(0)),
         ChangeNotifierProvider(create: (_) => PolarConnectProvider()),
+        ChangeNotifierProvider(create: (_) => GoDirectProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const MyApp(),
